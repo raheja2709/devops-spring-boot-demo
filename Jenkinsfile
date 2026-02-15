@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = "devops-spring-boot-demo"
-        DOCKER_IMAGE = "devops-spring-boot-demo:latest"
+        DOCKER_IMAGE = "developerjatin/devops-spring-boot-demo:latest"
     }
 
     stages {
@@ -24,6 +24,17 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-token', variable: 'DOCKER_TOKEN')]) {
+                    sh '''
+                        echo $DOCKER_TOKEN | docker login -u yourdockerhubusername --password-stdin
+                        docker push $DOCKER_IMAGE
+                    '''
+                }
             }
         }
     }
