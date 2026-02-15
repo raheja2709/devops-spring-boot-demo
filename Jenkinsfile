@@ -29,12 +29,16 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'docker-hub-creds', variable: 'DOCKER_TOKEN')]) {
-                    sh '''
-                        echo $DOCKER_TOKEN | docker login -u yourdockerhubusername --password-stdin
-                        docker push $DOCKER_IMAGE
-                    '''
-                }
+                withCredentials([usernamePassword(
+					credentialsId: 'docker-hub-creds',
+					usernameVariable: 'DOCKER_USER',
+					passwordVariable: 'DOCKER_PASS'
+				)]) {
+					sh '''
+					echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+					docker push developerjatin/devops-spring-boot-demo:latest
+					'''
+				}
             }
         }
     }
